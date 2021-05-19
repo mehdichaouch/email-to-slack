@@ -1,6 +1,6 @@
 # Send emails to Slack
 
-[![License: MIT](https://img.shields.io/github/license/advocodo/magento2-cart-quantity-multiple.svg?style=flat-square)](./LICENSE)
+[![License: MIT](https://img.shields.io/github/license/mehdichaouch/email-to-slack.svg?style=flat-square)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg "PRs Welcome")](https://github.com/mehdichaouch/email-to-slack/pulls)
 
 <p align="center">
@@ -39,7 +39,7 @@ After setting up your Slackbot chat as a forward emailing address of your email 
     - Create a new Slack App named: `Gmail Bot` or something else `Outlook Bot`
     - Navigate to the app dashboard and find `Event Subscriptions` in the sidebar
         - In `Request URL`, add your web server script url `https://domain.tld/email-to-slack.php`
-        - Subscribe to bot events `message.im` which is the only event we need to be notified about
+        - Subscribe to `message.im` in `Subscribe to events on behalf of users`
 
 4. In the sidebar, go to `OAuth & Permissions`
     - In `Scopes`, part `Bot Token Scopes` add these OAuth Scope:
@@ -86,7 +86,7 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) de
 
 ## Credits
 
-## Inspired by
+### Inspired by
 
 This was designed with the inspiration from this fine folks:
 - a Python version of [email-to-slack](https://github.com/kossiitkgp/email-to-slack/) from KOSS-Kharagpur Open Source Society
