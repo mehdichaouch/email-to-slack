@@ -61,15 +61,15 @@ function main()
         if (validate()) {
             $email = $json['event']['files'][0];
 
-            $allTo = [];
+            $allTo = array();
             foreach ($email['to'] as $emailTo) {
                 $allTo[] = $emailTo['original'];
             }
 
-            $data = [
+            $data = array(
                 'text' => '',
-                'attachments' => [
-                    [
+                'attachments' => array(
+                    array(
                         'fallback' => 'An email was sent by ' . $email['from'][0]['original'],
                         'color' => '#d32600',
                         'pretext' => '',
@@ -79,34 +79,34 @@ function main()
                         'title' => $email['title'],
                         'title_link' => 'http://gmail.com/',
                         'text' => $email['plain_text'],
-                        'fields' => [],
+                        'fields' => array(),
                         'footer' => 'Sent to : ' . implode(', ', $allTo),
                         'footer_icon' => '',
                         'ts' => $email['timestamp'],
-                    ]
-                ]
-            ];
+                    )
+                )
+            );
 
-            $allCc = [];
+            $allCc = array();
             foreach ($email['cc'] as $emailCc) {
                 $allCc[] = $emailCc['original'];
             }
             if ($allCc = implode(', ', $allCc)) {
-                $data['attachments'][0]['fields'][] = ['title' => 'cc', 'value' => $allCc];
+                $data['attachments'][0]['fields'][] = array('title' => 'cc', 'value' => $allCc);
             }
 
             if ($email['attachments']) {
-                $data['attachments'][0]['fields'][] = [
+                $data['attachments'][0]['fields'][] = array(
                     'title' => '',
                     'value' => 'This email also has attachments',
                     'short' => false,
-                ];
+                );
             }
 
             $curl = curl_init();
             curl_setopt_array(
                 $curl,
-                [
+                array(
                     CURLOPT_URL => $_ENV['INCOMING_WEBHOOK_URL'],
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_ENCODING => '',
@@ -116,10 +116,10 @@ function main()
                     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                     CURLOPT_CUSTOMREQUEST => 'POST',
                     CURLOPT_POSTFIELDS => json_encode($data),
-                    CURLOPT_HTTPHEADER => [
+                    CURLOPT_HTTPHEADER => array(
                         'Content-Type: application/json',
-                    ],
-                ]
+                    ),
+                )
             );
             $response = curl_exec($curl);
             curl_close($curl);

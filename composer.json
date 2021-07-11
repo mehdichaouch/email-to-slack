@@ -11,21 +11,17 @@
         }
     ],
     "require" : {
-      "php" : ">=5.4",
+      "php" : ">=5.3",
       "squizlabs/php_codesniffer" : "^2.6 || ^3.1.0",
       "phpcsstandards/phpcsutils" : "^1.0"
     },
     "require-dev" : {
-      "php-parallel-lint/php-parallel-lint": "^1.2.0",
-      "php-parallel-lint/php-console-highlighter": "^0.5",
       "phpunit/phpunit": "^4.8 || ^5.0 || ^6.0 || ^7.0 || ^8.0 || >=9.0 <9.3.0",
-      "phpcsstandards/phpcsdevtools": "^1.0"
+      "phpcsstandards/phpcsdevtools": "^1.0",
+      "phpcompatibility/php-compatibility": "*"
     },
     "conflict": {
       "squizlabs/php_codesniffer": "2.6.2"
-    },
-    "replace": {
-      "wimg/php-compatibility": "*"
     },
     "suggest" : {
       "roave/security-advisories": "dev-master || Helps prevent installing dependencies with known security issues."
@@ -66,6 +62,27 @@
         "@install-devcs",
         "@php ./vendor/squizlabs/php_codesniffer/bin/phpcbf",
         "@remove-devcs"
+      ],
+      "phpcs:lint": [
+          "Composer\\Config::disableProcessTimeout",
+          "phpcs -ps"
+      ],
+      "phpcs:compatibility": [
+        "@phpcs:lint --standard=PHPCompatibility"
       ]
+    },
+    "scripts-descriptions": {
+        "php:lint": "Run PHP's linter (`php -l`).",
+        "phpcs:changed": "Run phpcs over git changes only. One or more files must be specified.",
+        "phpcs:compatibility": "Run PHPCompatibility checks. One or more files or directories must be specified.",
+        "phpcs:fix": "Run phpcbf (phpcs's auto-fixer).",
+        "phpcs:fix:required": "Run phpcbf on files that are not excluded by bin/phpcs-excludelist.json.",
+        "phpcs:lint": "Run phpcs.",
+        "phpcs:lint:errors": "Run phpcs, exiting with failure only if errors were encountered.",
+        "phpcs:lint:required": "Run phpcs on files that are not excluded by bin/phpcs-excludelist.json.",
+        "php:autofix": "DEPRECATED. Use `composer phpcs:fix` instead.",
+        "php:changed": "DEPRECATED. Use `composer phpcs:changed` instead.",
+        "php:lint:errors": "DEPRECATED. Use `composer phpcs:lint:errors` instead.",
+        "php:requirelist": "DEPRECATED. Use `composer phpcs:lint:required` and/or `composer phpcs:fix:required` instead."
     }
 }
