@@ -1,0 +1,100 @@
+name: 🧪 Tests
+
+on:
+  # Run on all pushes and on all pull requests.
+  # Prevent the build from running when there are only irrelevant changes.
+  push:
+    paths-ignore:
+      - '**.md'
+  pull_request:
+  # Allow manually triggering the workflow.
+  workflow_dispatch:
+
+jobs:
+  #### PHP LINT STAGE ####
+  # Linting against high/low of each PHP major should catch everything.
+  # If needs be, we can always add interim versions back at a later point in time.
+  lint:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        php-versions: ['5.4', '5.6', '7.0', '7.4', '8.0']
+        experimental: [true]
+
+        include:
+          - php: '8.1'
+            experimental: true
+
+    name: "Lint: PHP ${{ matrix.php-versions }}"
+    continue-on-error: ${{ matrix.experimental }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          ini-values: error_reporting=E_ALL, display_errors=On
+          coverage: none
+          tools: cs2pr
+
+      - name: 'Composer: adjust dependencies'
+        # Remove PHPUnit requirement to save some bandwidth.
+        run: composer remove --no-update phpunit/phpunit
+
+      # Install dependencies and handle caching in one go.
+      # @link https://github.com/marketplace/actions/install-composer-dependencies
+      - name: Install Composer dependencies
+        uses: "ramsey/composer-install@v1"
+
+
+
+
+
+
+      - name: Lint against parse errors
+        if: ${{ matrix.php-versions != '5.4' && startsWith( matrix.php-versions, '8' ) == false }}
+        run: composer lint
+
+      - name: Lint against parse errors
+        if: ${{ matrix.php-versions == '5.4' || startsWith( matrix.php-versions, '8' ) }}
+        run: composer lint -- --checkstyle | cs2pr
+
+
+
+
+      - name: Install xmllint
+        if: ${{ matrix.php-versions == '5.4' || startsWith( matrix.php-versions, '8' ) }}
+        run: sudo apt-get install --no-install-recommends -y libxml2-utils
+
+      # Show XML violations inline in the file diff.
+      # @link https://github.com/marketplace/actions/xmllint-problem-matcher
+      - uses: korelstar/xmllint-problem-matcher@v1
+
+
+
+
+      # Validate the XML file.
+      # @link http://xmlsoft.org/xmllint.html
+#      - name: Validate ruleset against schema
+#        if: ${{ matrix.php-versions == '5.4' || startsWith( matrix.php-versions, '8' ) }}
+#        run: xmllint --noout --schema vendor/squizlabs/php_codesniffer/phpcs.xsd PHPCompatibility/ruleset.xml
+
+      # Check the code-style consistency of the XML file.
+#      - name: Check XML code style
+#        if: ${{ matrix.php-versions == '5.4' || startsWith( matrix.php-versions, '8' ) }}
+#        run: diff -B ./PHPCompatibility/ruleset.xml <(xmllint --format "./PHPCompatibility/ruleset.xml")
+
+      # Check the code-style consistency of the PHP files.
+      - name: Check PHP code style
+        if: ${{ matrix.php-versions == '5.4' || startsWith( matrix.php-versions, '8' ) }}
+        continue-on-error: true
+        run: vendor/bin/phpcs --no-cache --report-full --report-checkstyle=./phpcs-report.xml
+
+      - name: Show PHPCS results in PR
+        if: ${{ matrix.php-versions == '5.4' || startsWith( matrix.php-versions, '8' ) }}
+        run: cs2pr ./phpcs-report.xml
