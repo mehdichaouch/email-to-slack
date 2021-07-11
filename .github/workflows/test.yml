@@ -6,28 +6,28 @@ on:
   push:
     paths-ignore:
       - '**.md'
+      - '**.yml'
   pull_request:
   # Allow manually triggering the workflow.
   workflow_dispatch:
 
 jobs:
-  #### PHP LINT STAGE ####
-  # Linting against high/low of each PHP major should catch everything.
-  # If needs be, we can always add interim versions back at a later point in time.
-  lint:
+  ### Runs PHPCompatibility over all PHP files.
+  # Local equivalent: `composer phpcs:compatibility`
+  phpcompatibility:
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
         os: [ubuntu-latest]
-        php-versions: ['5.4', '5.6', '7.0', '7.4', '8.0']
+        php-versions: ['5.3', '5.4', '5.6', '7.0', '7.4', '8.0']
         experimental: [true]
 
-        include:
-          - php: '8.1'
-            experimental: true
+#        include:
+#          - php: '8.1'
+#            experimental: true
 
-    name: "Lint: PHP ${{ matrix.php-versions }}"
+    name: PHP Compatibility ${{ matrix.php-versions }}
     continue-on-error: ${{ matrix.experimental }}
 
     steps:
@@ -42,38 +42,120 @@ jobs:
           coverage: none
           tools: cs2pr
 
-      - name: 'Composer: adjust dependencies'
-        # Remove PHPUnit requirement to save some bandwidth.
-        run: composer remove --no-update phpunit/phpunit
-
       # Install dependencies and handle caching in one go.
       # @link https://github.com/marketplace/actions/install-composer-dependencies
       - name: Install Composer dependencies
-        uses: "ramsey/composer-install@v1"
+        uses: 'ramsey/composer-install@v1'
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate
+
+#      - name: Get Composer cache directory
+#        id: composer-cache
+#        run: |
+#          echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+#      - name: Use composer cache
+#        uses: actions/cache@v2
+#        with:
+#          path: ${{ steps.composer-cache.outputs.dir }}
+#          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+#          restore-keys: |
+#            ${{ runner.os }}-composer-
+
+      - name: Tool versions
+        run: |
+          which php
+          php --version
+          which composer
+          composer --version
+          which jq
+          jq --version
+          composer phpcs:lint -- --config-show installed_paths
+
+#      - name: Install dependencies
+#        run: composer install
+
+      - name: Run PHPCS for PHPCompatibility
+        run: |
+          composer phpcs:compatibility -- --report=emacs email-to-slack.php --runtime-set testVersion 5.3-8.0
+
+#          echo "::add-matcher::.github/matchers/phpcs-problem-matcher.json"
+#          composer phpcs:compatibility -- --report=emacs email-to-slack.php --runtime-set testVersion ${{ matrix.php-versions }}
+#          echo "::remove-matcher owner=phpcs"
+
+
+
+
+#      - name: Code style with PHP_CodeSniffer
+#        run: composer phpcs:lint -- --report=emacs email-to-slack.php
+
+#      - name: Code style with PHP_CodeSniffer
+#        run: composer phpcs:lint -- --report=checkstyle email-to-slack.php | cs2pr
 
 
 
 
 
 
-      - name: Lint against parse errors
-        if: ${{ matrix.php-versions != '5.4' && startsWith( matrix.php-versions, '8' ) == false }}
-        run: composer lint
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v2
 
-      - name: Lint against parse errors
-        if: ${{ matrix.php-versions == '5.4' || startsWith( matrix.php-versions, '8' ) }}
-        run: composer lint -- --checkstyle | cs2pr
+#      - name: Install PHP
+#        uses: shivammathur/setup-php@v2
+#        with:
+#          php-version: ${{ matrix.php-versions }}
+#          ini-values: error_reporting=E_ALL, display_errors=On
+#          coverage: none
+#          tools: cs2pr
+
+#      - name: Validate composer.json and composer.lock
+#        run: composer validate
+
+#      - name: 'Composer: adjust dependencies'
+        # Remove PHPUnit requirement to save some bandwidth.
+#        run: composer remove --no-update phpunit/phpunit
+
+      # Install dependencies and handle caching in one go.
+      # @link https://github.com/marketplace/actions/install-composer-dependencies
+#      - name: Install Composer dependencies
+#        uses: 'ramsey/composer-install@v1'
 
 
 
 
-      - name: Install xmllint
-        if: ${{ matrix.php-versions == '5.4' || startsWith( matrix.php-versions, '8' ) }}
-        run: sudo apt-get install --no-install-recommends -y libxml2-utils
+
+
+
+
+
+
+
+#      - name: Run PHPStan
+#        run: phpstan analyse . --level max
+
+
+
+
+#      - name: Lint against parse errors
+#        if: ${{ matrix.php-versions != '5.4' && startsWith( matrix.php-versions, '8' ) == false }}
+#        run: composer lint
+
+#      - name: Lint against parse errors
+#        if: ${{ matrix.php-versions == '5.4' || startsWith( matrix.php-versions, '8' ) }}
+#        run: composer lint -- --checkstyle | cs2pr
+
+
+
+
+#      - name: Install xmllint
+#        if: ${{ matrix.php-versions == '5.4' || startsWith( matrix.php-versions, '8' ) }}
+#        run: sudo apt-get install --no-install-recommends -y libxml2-utils
 
       # Show XML violations inline in the file diff.
       # @link https://github.com/marketplace/actions/xmllint-problem-matcher
-      - uses: korelstar/xmllint-problem-matcher@v1
+#      - uses: korelstar/xmllint-problem-matcher@v1
 
 
 
@@ -90,11 +172,11 @@ jobs:
 #        run: diff -B ./PHPCompatibility/ruleset.xml <(xmllint --format "./PHPCompatibility/ruleset.xml")
 
       # Check the code-style consistency of the PHP files.
-      - name: Check PHP code style
-        if: ${{ matrix.php-versions == '5.4' || startsWith( matrix.php-versions, '8' ) }}
-        continue-on-error: true
-        run: vendor/bin/phpcs --no-cache --report-full --report-checkstyle=./phpcs-report.xml
+#      - name: Check PHP code style
+#        if: ${{ matrix.php-versions == '5.4' || startsWith( matrix.php-versions, '8' ) }}
+#        continue-on-error: true
+#        run: vendor/bin/phpcs --no-cache --report-full --report-checkstyle=./phpcs-report.xml
 
-      - name: Show PHPCS results in PR
-        if: ${{ matrix.php-versions == '5.4' || startsWith( matrix.php-versions, '8' ) }}
-        run: cs2pr ./phpcs-report.xml
+#      - name: Show PHPCS results in PR
+#        if: ${{ ( matrix.php-versions == '5.4' || startsWith( matrix.php-versions, '8' ) ) && github.event.issue.pull_request }}
+#        run: cs2pr ./phpcs-report.xml
