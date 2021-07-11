@@ -2,6 +2,7 @@
 
 [![License: MIT](https://img.shields.io/github/license/mehdichaouch/email-to-slack.svg?style=flat-square)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg "PRs Welcome")](https://github.com/mehdichaouch/email-to-slack/pulls)
+[![Tested on PHP 5.4 to 8.0](https://img.shields.io/badge/tested%20on-PHP%205.4%20|%205.5%20|%205.6%20|%207.0%20|%207.1%20|%207.2%20|%207.3%20|%207.4%20|%208.0%20-brightgreen.svg?maxAge=2419200)](https://github.com/PHPCompatibility/PHPCompatibility/actions?query=workflow%3ATests)
 
 <p align="center">
   <img src="images/repository-open-graph.png" alt="Gmail notification"/>
