@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/github/license/mehdichaouch/email-to-slack.svg?style=flat-square)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg "PRs Welcome")](https://github.com/mehdichaouch/email-to-slack/pulls)
-[![Tested on PHP 5.4 to 8.0](https://img.shields.io/badge/tested%20on-PHP%205.4%20|%205.5%20|%205.6%20|%207.0%20|%207.1%20|%207.2%20|%207.3%20|%207.4%20|%208.0%20-brightgreen.svg?maxAge=2419200)](https://github.com/PHPCompatibility/PHPCompatibility/actions?query=workflow%3ATests)
+[![Tested on PHP 5.4 to 8.0](https://img.shields.io/badge/tested%20on-PHP%205.4%20|%205.5%20|%205.6%20|%207.0%20|%207.1%20|%207.2%20|%207.3%20|%207.4%20|%208.0%20-brightgreen.svg?maxAge=2419200)](https://github.com/mehdichaouch/email-to-slack/actions/workflows/tests.yml)
 
 <p align="center">
   <img src="images/repository-open-graph.png" alt="Gmail notification"/>
@@ -76,6 +76,11 @@ Note that the Slack IDs (for a channel, users, files) are alphanumeric uppercase
 
 Notes:
   - Slack creates a beautiful file for an email. But I could not find way to change file permissions which is shared privately with just the user. Hence, I have to customize and post the email. If there is a way to change file permissions from private to be shared in a team, that would be easy and the best way.
+
+
+## Alternative
+
+- A Google Script version [gmailToSlack.js](https://gist.github.com/rushimusmaximus/bcb847b89457b6936d50)
 
 ## Authors
 
