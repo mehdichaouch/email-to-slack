@@ -1,0 +1,22 @@
+{
+  "branchPrefix":"renovate-",
+  "labels":["dependencies"],
+  "packageRules": [
+    {
+      "packagePatterns": ["*"],
+      "enabled": false
+    },
+    {
+      "packagePatterns": ["^actions/"],
+      "groupName": "GitHub Actions",
+      "enabled": true
+    }
+  ],
+  "commitBodyTable": true,
+  "assignees": ["@mehdichaouch"],
+  "extends": [
+    "config:base",
+    ":gitSignOff",
+    "default:disablePrControls"
+  ]
+}
